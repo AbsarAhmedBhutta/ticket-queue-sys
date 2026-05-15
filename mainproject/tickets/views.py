@@ -20,3 +20,10 @@ def create_ticket(request):
         )
         return redirect('create_ticket')
     return render(request, 'create_ticket.html')
+
+def agent_dashboard(request):
+    tickets = Ticket.objects.all().order_by("-created_at")
+
+    return render(request, "dashboard.html", {
+        "tickets": tickets
+    })
