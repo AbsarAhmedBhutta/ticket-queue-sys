@@ -41,9 +41,12 @@ class Ticket(models.Model):
         default=Status.PENDING
     )
 
-    created_by = models.ForeignKey(SupportUser, on_delete=models.CASCADE)
+    created_by = models.ForeignKey(SupportUser, on_delete=models.CASCADE,  null=True, blank=True)
     assigned_to = models.ForeignKey(SupportStaff, on_delete=models.CASCADE, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f'{self.title}'
 
 class Comment(models.Model):
     ticket = models.ForeignKey(
