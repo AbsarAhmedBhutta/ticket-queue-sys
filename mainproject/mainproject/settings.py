@@ -36,6 +36,8 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'tickets',
+    'channels',
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -71,8 +73,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'mainproject.wsgi.application'
-
+ASGI_APPLICATION = "mainproject.asgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
@@ -107,7 +108,14 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
