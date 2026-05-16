@@ -1,26 +1,98 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title></title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="">
-    </head>
-    <body>
-        <h1>Agent Dashboard</h1>
+<head>
+    <meta charset="utf-8">
+    <title>Agent Dashboard</title>
+</head>
+<body>
 
-        <div id="ticket-list">
-            {% for ticket in tickets %}
-                <div class="ticket">
-                    <h3>{{ ticket.title }}</h3>
-                    <p>{{ ticket.description }}</p>
-                    <small>By: {{ ticket.customer_name }}</small>
-                    <p>Status: {{ ticket.status }}</p>
-                </div>
+    <h1>Agent Dashboard</h1>
+
+    <div id="ticket-list">
+
+        {% for ticket in tickets %}
+            <div class="ticket" id="ticket-{{ ticket.id }}">
+                <h3>{{ ticket.title }}</h3>
+
+                <p>{{ ticket.description }}</p>
+                <p>
+                    Status:
+                    <span class="status">
+                        {{ ticket.status }}
+                    </span>
+                </p>
+
                 <hr>
-            {% endfor %}
-        </div>
-        </body>
+            </div>
+        {% endfor %}
+
+    </div>
+
+    <script>
+
+        // CONNECT TO WEBSOCKET
+        const socket = new WebSocket(
+            "ws://" + window.location.host + "/ws/tickets/"
+        );
+
+
+        // RUNS WHEN MESSAGE ARRIVES
+        socket.onmessage = function(event) {
+
+            const data = JSON.parse(event.data);
+
+            console.log("WebSocket Message:", data);
+
+
+            // HANDLE NEW TICKET EVENT
+            if (data.type === "ticket_created") {
+
+                const ticket = data.ticket;
+
+                // TARGET MAIN CONTAINER
+                const ticketList = document.getElementById("ticket-list");
+
+
+                // CREATE NEW HTML BLOCK
+                const newTicket = document.createElement("div");
+
+                newTicket.classList.add("ticket");
+
+                newTicket.id = `ticket-${ticket.id}`;
+
+
+                // INSERT TICKET DATA
+                newTicket.innerHTML = `
+                    <h3>${ticket.title}</h3>
+
+                    <p>${ticket.description || ""}</p>
+                    <p>
+                        Status:
+                        <span class="status">
+                            ${ticket.status}
+                        </span>
+                    </p>
+
+                    <hr>
+                `;
+
+
+                // ADD NEW TICKET TO PAGE
+                ticketList.prepend(newTicket);
+            }
+        };
+
+
+        // OPTIONAL DEBUGGING
+        socket.onopen = function() {
+            console.log("WebSocket Connected");
+        };
+
+        socket.onclose = function() {
+            console.log("WebSocket Disconnected");
+        };
+
+    </script>
+
+</body>
 </html>
